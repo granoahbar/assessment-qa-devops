@@ -6,19 +6,25 @@ const {shuffleArray} = require('./utils')
 
 app.use(express.json())
 
+var Rollbar = require('rollbar')
+var rollbar = new Rollbar({
+  accessToken: '8bee21bbe733444d9dc23104ca6f548c',
+  captureUncaught: true,
+  captureUnhandledRejections: true,
+})
 
-port=3000
+app.get('/', (req, res) => {
+    rollbar.log('HTML page loadeed successfully')
+    res.sendFile(path.join(__dirname, '/public/index.html'))
+})
 
-app.use('/', express.static(path.join(__dirname, '../public/index.html')))
+app.get('/styles', (req, res) => {
+    res.sendFile(path.join(__dirname, '/public/index.css'))
+})
 
-app.use(express.static(path.join(__dirname, '../public')))
-
-app.post('/register', (req, res) => res.status(200).send('Registered'))
-
-app.listen(port, () => {
-    console.log('Docked at port ' + 3000)
-  })
-,
+app.get('/js', (req, res) => {
+    res.sendFile(path.join(__dirname, '/public/index.js'))
+})
 
 
 
@@ -26,6 +32,7 @@ app.get('/api/robots', (req, res) => {
     try {
         res.status(200).send(botsArr)
     } catch (error) {
+        rollbar.error('bots no loady')
         console.log('ERROR GETTING BOTS', error)
         res.sendStatus(400)
     }
@@ -33,6 +40,7 @@ app.get('/api/robots', (req, res) => {
 
 app.get('/api/robots/five', (req, res) => {
     try {
+        rollbar.error('failed getting bots')
         let shuffled = shuffleArray(bots)
         let choices = shuffled.slice(0, 5)
         let compDuo = shuffled.slice(6, 8)
@@ -45,6 +53,7 @@ app.get('/api/robots/five', (req, res) => {
 
 app.post('/api/duel', (req, res) => {
     try {
+        rollbar.error('Dual Failed')
         // getting the duos from the front end
         let {compDuo, playerDuo} = req.body
 
@@ -76,6 +85,7 @@ app.post('/api/duel', (req, res) => {
 
 app.get('/api/player', (req, res) => {
     try {
+        rollbar.error('Player stats failed')
         res.status(200).send(playerRecord)
     } catch (error) {
         console.log('ERROR GETTING PLAYER STATS', error)
