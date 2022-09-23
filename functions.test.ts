@@ -18,8 +18,6 @@ describe('shuffleArray should', () => {
             if(arr.includes(result[i]) === false) {
                 myVar = false
                 return
-            }  
-    }
-
-
+         }  
+    })
 })
